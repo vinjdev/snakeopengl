@@ -14,6 +14,7 @@ void shader_destroy(Shader *self);
 void shader_setBool(Shader* self,const char* name,int value);
 void shader_setInt(Shader* self,const char* name,int value);
 void shader_setFloat(Shader* self,const char* name,float value);
+void shader_setvec4(Shader* self, const char* name,vec4 color);
 void shader_setMat4(Shader* self,const char* name,mat4 mat);
 
 #endif // !SHADER_H

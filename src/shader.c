@@ -86,6 +86,11 @@ void shader_setInt(Shader* self,const char* name,int value) {
 void shader_setFloat(Shader* self,const char* name,float value) {
     glUniform1i(glGetUniformLocation(self->handle,name),value);
 }
+
+void shader_setvec4(Shader* self, const char* name,vec4 color) {
+    glUniform4f(glGetUniformLocation(self->handle,name),color[0],color[1],color[2],color[3]);
+}
+
 void shader_setMat4(Shader* self,const char* name,mat4 mat) {
     glUniformMatrix4fv(glGetUniformLocation(self->handle,name),1,GL_FALSE,(float *) mat);
 }
