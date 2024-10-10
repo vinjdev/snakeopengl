@@ -34,7 +34,7 @@ void render_init(Render* self) {
 }
 void render_quad(Render* self,Shader* shader,vec2 pos, vec2 size, float rotation) {
     mat4 model; glm_mat4_identity(model);
-    glm_translate(model,(vec3){pos[0],pos[1],0.0f});
+    glm_translate(model,(vec3){pos[0]+size[0]/2,pos[1]+size[1]/2,0.0f});
     glm_rotate_z(model,glm_rad(rotation),model);
     glm_scale(model,(vec3){size[0],size[1],1.0f});
 

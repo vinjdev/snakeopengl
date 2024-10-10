@@ -18,7 +18,6 @@ typedef struct {
     vec2 pos;
 } Point;
 
-
 Point snake[MAX_SNAKE_LENGTH];
 Point food;
 vec2 direction = {1,0};
@@ -95,16 +94,18 @@ void update_snake() {
         snake[0].pos[0] += direction[0] * GRID_SIZE;
         snake[0].pos[1] += direction[1] * GRID_SIZE;
         
-        if (snake[0].pos[0] > SCREEN_WIDTH) snake[0].pos[0] = 0;
-        if (snake[0].pos[0] < 0) snake[0].pos[0] = SCREEN_WIDTH;
-        if (snake[0].pos[1] > SCREEN_HEIGHT) snake[0].pos[1] = 0;
-        if (snake[0].pos[1] < 0) snake[0].pos[1] = SCREEN_HEIGHT;
+        if (snake[0].pos[0] > SCREEN_WIDTH)  gameOver = 1;//snake[0].pos[0] = 0;
+        if (snake[0].pos[0] < 0)             gameOver = 1;
+        if (snake[0].pos[1] > SCREEN_HEIGHT) gameOver = 1;
+        if (snake[0].pos[1] < 0)             gameOver = 1;
 
         for (int i = 1; i < snake_length - 1; i++) {
             if (snake[0].pos[0] == snake[i].pos[0] && snake[0].pos[1] == snake[i].pos[1]) {
                 gameOver = 1;
-                printf("game over\n");
             }
+        }
+        if (gameOver) {
+            printf("game over...\n");
         }
     }
      
@@ -118,10 +119,15 @@ void render_food(Render* render, Shader* shader) {
 
 void render_snake(Render* render, Shader* shader) {
     vec2 size = {GRID_SIZE,GRID_SIZE};
-    for(int i = 0; i < snake_length; i++) {
-        shader_setvec4(shader,"uColor",(vec4) {1.0f,1.0f,1.0f,1.0f});
+
+    shader_setvec4(shader,"uColor",(vec4) {0.0f,1.0f,0.0f,1.0f});
+    render_quad(render,shader,snake[0].pos,size,0.0f);
+
+    for(int i = 1; i < snake_length; i++) {
+        shader_setvec4(shader,"uColor",(vec4) {0.0f,1.0f-i*0.01f,0.0f,1.0f});
         render_quad(render,shader,snake[i].pos,size,0.0f);
     }
+    
 }
 
 
@@ -179,6 +185,7 @@ int main() {
         
         render_food(&render,shader);
         render_snake(&render,shader);
+
 
         glfwSwapBuffers(window);
         glfwPollEvents();
