@@ -11,7 +11,7 @@
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
 #define GRID_SIZE 40
-#define MAX_SNAKE_LENGTH SCREEN_WIDTH/GRID_SIZE * SCREEN_HEIGHT / GRID_SIZE
+#define MAX_SNAKE_LENGTH (SCREEN_WIDTH/GRID_SIZE) * (SCREEN_HEIGHT / GRID_SIZE)
 #define UPDATE_INTERVAL 0.15f
 
 typedef struct {
@@ -59,20 +59,16 @@ static void key_callback(GLFWwindow* window, int key,int scancode,int action,int
 }
 
 void draw_border(Render* render, Shader* shader) {
+    // set color white
     shader_setvec4(shader, "uColor", (vec4) {1.0f, 1.0f, 1.0f, 0.3f});
     
-    // Draw vertical grid lines
-    for (int x = 0; x <= SCREEN_WIDTH; x += GRID_SIZE) {
-        render_quad(render, shader, (vec2) {x, 0}, (vec2) {1.0f, SCREEN_HEIGHT}, 0.0f); // Vertical line (1-pixel wide)
-    }
-
-    // Draw horizontal grid lines
-    for (int y = 0; y <= SCREEN_HEIGHT; y += GRID_SIZE) {
-        render_quad(render, shader, (vec2) {0, y}, (vec2) {SCREEN_WIDTH, 1.0f}, 0.0f);  // Horizontal line (1-pixel tall)
+    for (int i = 0; i <= SCREEN_WIDTH; i += GRID_SIZE) {
+        render_quad(render, shader, (vec2) {i, 0}, (vec2) {1.0f, SCREEN_HEIGHT}, 0.0f);
+        render_quad(render, shader, (vec2) {0, i}, (vec2) {SCREEN_WIDTH, 1.0f}, 0.0f);
     }
 }
 
-void generate_food() {
+void generate_food() {      // random index for grid pos   
     food.pos[0] = (rand() % (SCREEN_WIDTH / GRID_SIZE)) * GRID_SIZE;
     food.pos[1] = (rand() % (SCREEN_HEIGHT / GRID_SIZE)) * GRID_SIZE;
 }
@@ -88,6 +84,7 @@ void init_snake() {
 
 void update_snake() {
     if (!gameOver) {
+        //collision detection FOOD
         if (snake[0].pos[0] == food.pos[0] && snake[0].pos[1] == food.pos[1]) {
             if (snake_length < MAX_SNAKE_LENGTH) {
                 snake_length++;
@@ -99,18 +96,22 @@ void update_snake() {
                 }
             }
         }
+
+        // makes the snake bigger
         for (int i = snake_length - 1; i > 0; i--) {
             glm_vec2_copy(snake[i-1].pos,snake[i].pos);
         }
+        // moves the snake
         snake[0].pos[0] += direction[0] * GRID_SIZE;
         snake[0].pos[1] += direction[1] * GRID_SIZE;
         
-        //collision
+        //collision detection screen
         if (snake[0].pos[0] > SCREEN_WIDTH)  gameOver = 1; 
         if (snake[0].pos[0] < 0)             gameOver = 1;
         if (snake[0].pos[1] > SCREEN_HEIGHT) gameOver = 1;
         if (snake[0].pos[1] < 0)             gameOver = 1;
 
+        //collision detection self
         for (int i = 1; i < snake_length - 1; i++) {
             if (snake[0].pos[0] == snake[i].pos[0] && snake[0].pos[1] == snake[i].pos[1]) {
                 gameOver = 1;
@@ -125,7 +126,7 @@ void update_snake() {
 
 void render_food(Render* render, Shader* shader) {
     vec2 size = {GRID_SIZE-1, GRID_SIZE-1};
-    vec2 offset = {1.0f,1.0f};
+    vec2 offset = {10.0f,10.0f};
     vec2 pos = {food.pos[0]+offset[0],food.pos[1]+offset[1]};
     shader_setvec4(shader,"uColor",(vec4) {1.0f,0.0f,0.0f,1.0f});
     render_quad(render,shader,pos, size, 0.0f);
